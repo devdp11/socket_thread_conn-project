@@ -1,7 +1,6 @@
 import socket
 import threading
 
-# Dicionário para rastrear conexões de clientes e seus nomes
 clients = {}
 
 # Função para lidar com as mensagens de um cliente
@@ -16,6 +15,8 @@ def handle_client(client_socket, client_name):
                 if other_client_socket != client_socket:
                     full_message = f"{client_name}: {message}"
                     other_client_socket.send(full_message.encode())
+                    
+                    print(f"{full_message}")
         except:
             break
     
@@ -35,14 +36,14 @@ server_socket.bind((ip, port))
 
 server_socket.listen(5)
 
-print(f"Servidor alocado no IP: {ip} e porta: {port}")
+print(f"\nServer Alocated on IP: {ip} with the door: {port}\n")
 
 while True:
     # Aceita uma conexão quando um cliente se conecta
     client_socket, client_address = server_socket.accept()
     client_name = client_socket.recv(1024).decode()
     
-    print(f"Conexão recebida de {client_address} --> Bem-vindo {client_name}")
+    print(f"Connection established with the client {client_address} --> Welcome {client_name}\n")
     
     # Adiciona o cliente à lista de clientes
     clients[client_socket] = client_name
