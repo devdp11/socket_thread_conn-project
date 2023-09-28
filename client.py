@@ -3,30 +3,47 @@ import threading
 
 def menu():
     while True:
-        print('\n1 - Messenger')
+        print('1 - Messenger')
         print('2 - Calculator')
-        print('3 - Quit')
-        option = int(input('Choose a option:'))
-        print()
+        print('0 - Quit')
+        op1 = int(input('Choose a option:'))
 
-        if option == 1:
+        if op1 == 1:
             receive_thread = threading.Thread(target=receive_messages, args=(client_socket, name))
             receive_thread.start()
 
             while True:
                 message = input()
                 if message == "/return":
-                    break  # Retorna ao menu principal das 3 opções
-                print(f"Eu: {message}")
+                    break
                 client_socket.send(message.encode())
 
-        elif option == 2:
-            print('calculadora')
+        elif op1 == 2:
+            while True:
+                print('1 - Add')
+                print('2 - Sub')
+                print('3 - Div')
+                print('4 - Mul')
+                print('0 - Return')
+                op2 = int(input('Choose a option:'))
 
-        elif option == 3:
+                if op2 == 1:
+                    pass
+                elif op2 == 2:
+                    pass
+                elif op2 == 3:
+                    pass
+                elif op2 == 4:
+                    pass
+                elif op2 == 0:
+                    break
+                else:
+                    print('\nChoose a valid option!')
+
+        elif op1 == 0:
             response = input('Are you sure you want to leave the application? (y/n)')
             if response == 'y':
-                print('\nLeaving the program ...')
+                print('Leaving the program ...')
                 client_socket.close()
                 return  
             elif response == 'n':
@@ -40,6 +57,7 @@ def receive_messages(client_socket, client_name):
         try:
             message = client_socket.recv(1024).decode()
             print(f"{message}")
+            print()
         except:
             break
 
@@ -53,7 +71,7 @@ client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 client_socket.connect((ip, port))
 
-name = input('\nIntroduce your name:')
+name = input('Introduce your name:')
 client_socket.send(name.encode())
 
 menu()
