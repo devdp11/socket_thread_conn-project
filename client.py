@@ -21,13 +21,17 @@ def menu():
         elif op1 == 2:
             operation = input('Introduce your mathematic operation:')
             
-            # Tenta realizar a operação matematica, caso sejam introduzidos letras ou a sintaxe esteja errada, é mostrado uma exception na linha de comandos do cliente
-            # De seguida, passamos a variável "res" para string, de modo a evitarmos erros na codificação e envio da "mensagem"
             try:
-                res = eval(operation)
-                res_str = str(res)
-                client_socket.send(f"calc_result: {res_str}".encode("utf-8"))
-                print(f'The final result of the calculation is: {res_str}')
+                # Envia a operação de cálculo para o servidor
+                client_socket.send(f"calc_operation: {operation}".encode("utf-8"))
+                
+                # Aguarda a resposta do servidor com o resultado
+                result_message = client_socket.recv(1024).decode("utf-8")
+                if result_message.startswith("calc_result: "):
+                    calc_result = result_message[len("calc_result: "):]
+                    print(f'The final result of the calculation is: {calc_result}')
+                else:
+                    print(f"Unexpected response from server: {result_message}")
             except Exception as e:
                 print(f"An Error has appeared: {e}")
 
