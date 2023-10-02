@@ -1,23 +1,26 @@
 import socket
 import threading
+from datetime import datetime
 
 # Dicionário para rastrear os clientes conectados
 clients = {}
-
 # Variável para rastrear o número máximo de clientes
 max_clients = 2
-
 # Semáforo para controlar o acesso concorrente à variável max_clients
 max_clients_lock = threading.Semaphore(1)
 
 # Função para lidar com as mensagens enviadas por um cliente
 def handle_client_input(client_socket, client_name, client_address):
+    time = datetime.now().strftime("%d-%m-%Y %H:%M")
     while True:
         try:
+            # Aqui, o server tenta receber a mensagem enviada pelo cliente e descodifica, mesmo que seja da opção 1 (Messenger) ou 2 (Calculadora)
+            # Se não for "true", volta para o menu
             message = client_socket.recv(1024).decode("utf-8")
             if not message:
                 break
             
+            # Neste caso, quando a mensagem começa "startswith" com calc_result, é enviado um print a dizer que esta mensagem é proveniente da calculadora, e que cliente fez a operação matemática
             if message.startswith("calc_operation: "):
                 calc_operation = message[len("calc_operation: "):]
                 try:
@@ -25,21 +28,21 @@ def handle_client_input(client_socket, client_name, client_address):
                     res = eval(calc_operation)
                     res_str = str(res)
                     client_socket.send(f"calc_result: {res_str}".encode("utf-8"))
-                    print(f'The final result of the calculation is: {res_str}')
-                except Exception as e:
+                    print(f'[{time}] - Operation result made by client {client_name}: {res_str}')
+                except Exception as e: # Envio do erro caso aconteça um erro de sintaxe ou outro qualquer
                     client_socket.send(f"calc_result: Error: {e}".encode("utf-8"))
+            elif message.startswith("/return"):
+                print(f'[{time}] - Client {client_name} has left the chat')
             else:
-                full_message = f"{client_name}: {message}"
+                # Senão for mensagem de calculo, é enviado uma mensagem para o cmd, com o nome do cliente que a enviou e o conteúdo da mensagem
+                full_message = f"[{time}] - Message sent by client {client_name}: {message}"
                 print(f"{full_message}")
 
-            for other_client_socket in clients.values():
-                if other_client_socket != client_socket:
-                    other_client_socket.send(full_message.encode("utf-8"))
         except Exception as e:
             print(f"An Error has appeared: {e}")
             break
 
-    # Quando a conexão do cliente é terminada, o mesmo é removida da lista do clients
+    # Quando a conexão do cliente é terminada, o mesmo é removido da lista do clientes e é liberado acesso a novos clientes
     with max_clients_lock:
         del clients[client_name]
         client_socket.close()
@@ -65,9 +68,8 @@ def handle_server():
                 print(f"Connection established with the client {client_address} --> Welcome {client_name}")
 
                 clients[client_name] = client_socket  # Adicione o cliente à lista de clientes
-                print(clients)
 
-        # Inicie uma nova thread para lidar com as mensagens do cliente
+        # Criação de uma thread para lidar com as mensagens do cliente
         client_thread = threading.Thread(target=handle_client_input, args=(client_socket, client_name, client_address))
         client_thread.start()
 

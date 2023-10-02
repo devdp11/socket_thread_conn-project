@@ -1,5 +1,6 @@
 import socket
 import os
+from datetime import datetime
 
 def menu():
     while True:
@@ -14,9 +15,9 @@ def menu():
                 # Caso escrever uma mensagem, esta é codificada usando o algoritmo "utf-8" e é enviada para o server, onde será transmitida no cmd
                 # Caso escreva "/return", dá break e envia o cliente de volta para o menu inicial.
                 message = input("Enter your message (type '/return' to go back to menu): ")
+                client_socket.send(f"{message}".encode("utf-8"))
                 if message == "/return":
                     break
-                client_socket.send(message.encode("utf-8"))
 
         elif op1 == 2:
             operation = input('Introduce your mathematic operation:')
@@ -25,11 +26,11 @@ def menu():
                 # Envia a operação de cálculo para o servidor
                 client_socket.send(f"calc_operation: {operation}".encode("utf-8"))
                 
-                # Aguarda a resposta do servidor com o resultado
+                # Após o envio da operação para o servidor, esperasse a resposta dessa mesma operação que irá ser recebida aqui e demonstrada no cmd
                 result_message = client_socket.recv(1024).decode("utf-8")
                 if result_message.startswith("calc_result: "):
                     calc_result = result_message[len("calc_result: "):]
-                    print(f'The final result of the calculation is: {calc_result}')
+                    print(f'The final result of the operation is: {calc_result}')
                 else:
                     print(f"Unexpected response from server: {result_message}")
             except Exception as e:
