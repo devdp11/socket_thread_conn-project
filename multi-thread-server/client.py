@@ -15,6 +15,7 @@ def connect():
     os.system('cls')
     name = input('Introduce your username:')
     client_socket.send(name.encode("utf-8"))
+    return client_socket
     
 def recv_msg(client_socket):
     global in_chat
