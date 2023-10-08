@@ -25,13 +25,13 @@ def handle_client_input(client_socket, client_name, client_address):
                     res = eval(calc_operation)
                     res_str = str(res)
                     client_socket.send(f"calc-res: {res_str}".encode("utf-8"))
-                    print(f'Operation result made by client {client_name}-[{client_address}]: {res_str}')
+                    print(f'[{time}] - Operation result made by client {client_name}-[{client_address}]: {res_str}')
                 except Exception as e: # Envio do erro
                     client_socket.send(f"calc-res: Error: {e}".encode("utf-8"))
                     
             else:
                 # Senão for mensagem de calculo, é enviado uma mensagem para o cmd, com o nome do cliente que a enviou e o conteúdo da mensagem
-                full_message = f"Message sent by client {client_name}-[{client_address}]: {message}"
+                full_message = f"[{time}] - Message sent by client {client_name}-[{client_address}]: {message}"
                 client_socket.send(f"Message has been received".encode("utf-8"))
                 print(f"{full_message}")
 

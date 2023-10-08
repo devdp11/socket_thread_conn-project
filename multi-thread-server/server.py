@@ -32,12 +32,12 @@ def handle_input(client_socket, client_name, client_address):
                 break
        
             elif message.startswith("chat"):
-                print(f"{client_name}-[{client_address}] has entered the universal chat!")
+                print(f"[{time}] - {client_name}-[{client_address}] has entered the universal chat!")
                 while True:
                     msg = client_socket.recv(1024).decode("utf-8")
 
                     if not msg or msg == "/return":
-                        print(f"{client_name}-[{client_address}] has left the universal chat!")
+                        print(f"[{time}] - {client_name}-[{client_address}] has left the universal chat!")
                         break
                     else:
                         handle_thread(f"{client_name}: {msg}", client_socket)
