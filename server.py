@@ -3,7 +3,7 @@ import threading
 from datetime import datetime
 import os
 
-# Dicionário para rastrear os clientes conectados / Variável para rastrear o número máximo de clientes / Semáforo para controlar o acesso à variável max_clients
+# Dicionário para armazenar os clientes conectados / Dicionário para armazenar os usernames dos clientes conectados / Variável para encontrar o número máximo de clientes / Semáforo para controlar o acesso à variável max_clients
 clients = []
 usernames = []
 max_clients = 2
@@ -100,7 +100,7 @@ def handle_server():
                 client_address = f"{ip}:{port}"
 
                 print(f"[{time}] - Connection established with the client [{client_address}] --> Welcome {client_name}")
-                # Store the client as a tuple (client_name, client_socket) in the clients list
+                # Armazenar um cliente num tuple (client_name, client_socket) na lista clients
                 clients.append((client_name, client_socket))
                 usernames.append(client_name)
 

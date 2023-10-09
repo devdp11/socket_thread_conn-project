@@ -87,7 +87,7 @@ def main(client_socket):
             os.system('cls')
             client_socket.send(f"list".encode("utf-8"))
             
-            # Wait to receive and print the list of connected clients
+            # Aqui o cliente vai receber a lista dos usernames dos clientes conectados e armazena os numa variável para depois ser exposta no cmd
             clients_list = client_socket.recv(1024).decode("utf-8")
             print(clients_list)
             input("Press Enter to continue...")
