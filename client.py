@@ -19,14 +19,18 @@ def connect():
     
 def recv_msg(client_socket):
     global in_chat
-    while True:
+    while in_chat:
         try:
             message = client_socket.recv(1024).decode("utf-8")
             if in_chat:
                 print(message)
+                if message.strip() == "You left the chat.":
+                    in_chat = False
         except Exception as e:
             print(f"An Error has appeared {e}")
             break
+
+
 
 def main(client_socket):
     global in_chat
@@ -53,7 +57,9 @@ def main(client_socket):
                     client_socket.send(f"{message}".encode("utf-8"))
                     if message.lower() == "/return":
                         in_chat = False
+                        client_socket.send("You left the chat.".encode("utf-8"))
                         break
+
         elif op1 == 2:
             os.system('cls')
             while True:
