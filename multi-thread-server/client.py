@@ -30,12 +30,13 @@ def recv_msg(client_socket):
 
 def main(client_socket):
     global in_chat
-    receive_thread = threading.Thread(target=recv_msg, args=(client_socket,))
-    receive_thread.start()
 
     while True:
         os.system('cls')
         print('1 - Chat with clients')
+        print('2 - Chat to server')
+        print('3 - Math calculator')
+        print('4 - List connected clients')
         print('0 - Quit')
         op1 = int(input('Choose an option:'))
 
@@ -43,16 +44,53 @@ def main(client_socket):
             os.system('cls')
             in_chat = True
             if in_chat:
-                client_socket.send("chat".encode("utf-8"))
+                client_socket.send("chat".encode("utf-8")) 
                 print("You entered the chat (Type /return to leave)")
+                receive_thread = threading.Thread(target=recv_msg, args=(client_socket,))
+                receive_thread.start()
                 while True:
                     message = input()
-                    
-                    if in_chat:  # Verifique se ainda está no chat antes de enviar mensagens
-                        client_socket.send(f"{message}".encode("utf-8"))
-                        if message.lower() == "/return":
-                            in_chat = False  # Define in_chat como False ao sair do chat
-                            break
+                    client_socket.send(f"{message}".encode("utf-8"))
+                    if message.lower() == "/return":
+                        in_chat = False
+                        break
+        elif op1 == 2:
+            os.system('cls')
+            while True:
+                message = input("Write your message (Type /return to leave): ")
+                if message.lower() == "/return":
+                    break
+                else:
+                    client_socket.send(f"{message}".encode("utf-8"))
+                    server_response = client_socket.recv(1024).decode("utf-8")
+                    if server_response.startswith("Message has been received"):
+                        print(server_response)
+        elif op1 == 3:
+            os.system('cls')
+            while True:
+                operation = input('Write a mathematical operation (Type /return to leave):')
+                if operation.lower() == "/return":
+                    break
+                else:
+                    try:
+                        client_socket.send(f"calc-op: {operation}".encode("utf-8"))    
+                        result_message = client_socket.recv(1024).decode("utf-8")
+                        if result_message.startswith("calc-res: "):
+                            os.system('cls')
+                            calc_result = result_message[len("calc-res: "):]
+                            print(f'The final result of the operation is: {calc_result}')
+                        else:
+                            print(f"Unexpected response from server: {result_message}")
+                    except Exception as e:
+                        print(f"Error: {e}")
+        elif op1 == 4:
+            os.system('cls')
+            client_socket.send(f"list".encode("utf-8"))
+            
+            # Wait to receive and print the list of connected clients
+            clients_list = client_socket.recv(1024).decode("utf-8")
+            print(clients_list)
+            input("Press Enter to continue...")
 
         elif op1 == 0:
             os.system('cls')

@@ -5,6 +5,7 @@ import os
 
 # Dicionário para rastrear os clientes conectados / Variável para rastrear o número máximo de clientes / Semáforo para controlar o acesso à variável max_clients
 clients = []
+usernames = []
 max_clients = 2
 max_clients_lock = threading.Semaphore(1)
 
@@ -18,10 +19,11 @@ def handle_thread(message, client_socket):
             except:
                 remove_client(client[1])
 
-def remove_client(client_socket):
+def remove_client(client_socket, client_name):
     for client in clients:
         if client[1] == client_socket:
             clients.remove(client)
+            usernames.remove(client_name)
             
 def handle_input(client_socket, client_name, client_address):
     while True:
@@ -30,7 +32,17 @@ def handle_input(client_socket, client_name, client_address):
             message = client_socket.recv(1024).decode("utf-8")
             if not message:
                 break
-       
+
+            if message.startswith("calc-op: "):
+                calc_operation = message[len("calc-op: "):]
+                try:
+                    res = eval(calc_operation)
+                    res_str = str(res)
+                    client_socket.send(f"calc-res: {res_str}".encode("utf-8"))
+                    print(f'[{time}] - Operation result made by client {client_name}-[{client_address}]: {res_str}')
+                except Exception as e: # Envio do erro
+                    client_socket.send(f"calc-res: Error: {e}".encode("utf-8"))
+
             elif message.startswith("chat"):
                 print(f"[{time}] - {client_name}-[{client_address}] has entered the universal chat!")
                 while True:
@@ -42,6 +54,13 @@ def handle_input(client_socket, client_name, client_address):
                     else:
                         handle_thread(f"{client_name}: {msg}", client_socket)
                         print(f"[{time}] - Message sent by client {client_name}-[{client_address}]: {msg}")
+            elif message.startswith('list'):
+                client_socket.send("\nConnected Clients:\n".encode('utf-8') + ", ".join(usernames).encode('utf-8'))
+            else:
+                # Senão for mensagem de calculo, é enviado uma mensagem para o cmd, com o nome do cliente que a enviou e o conteúdo da mensagem
+                full_message = f"[{time}] - Message sent by client {client_name}-[{client_address}]: {message}"
+                client_socket.send(f"Message has been received".encode("utf-8"))
+                print(f"{full_message}")
 
         except Exception as e:
             print(f"An Error has appeared: {e}")
@@ -54,6 +73,7 @@ def handle_input(client_socket, client_name, client_address):
                 clients.pop(idx)
                 client_socket.close()
                 print(f"[{time}] - Connection ended with the client [{client_address}] --> Goodbye {client_name}")
+                usernames.remove(client_name)
 
 def handle_server():
     host = socket.gethostname()
@@ -82,6 +102,7 @@ def handle_server():
                 print(f"[{time}] - Connection established with the client [{client_address}] --> Welcome {client_name}")
                 # Store the client as a tuple (client_name, client_socket) in the clients list
                 clients.append((client_name, client_socket))
+                usernames.append(client_name)
 
         # Criação de uma thread para lidar com as mensagens do cliente
         client_thread = threading.Thread(target=handle_input, args=(client_socket, client_name, client_address))
