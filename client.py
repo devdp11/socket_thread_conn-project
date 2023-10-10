@@ -30,8 +30,6 @@ def recv_msg(client_socket):
             print(f"An Error has appeared {e}")
             break
 
-
-
 def main(client_socket):
     global in_chat
 
@@ -86,7 +84,7 @@ def main(client_socket):
                             calc_result = result_message[len("calc-res: "):]
                             print(f'The final result of the operation is: {calc_result}')
                         else:
-                            print(f"Unexpected response from server: {result_message}")
+                            print(f"Unexpected response from server")
                     except Exception as e:
                         print(f"Error: {e}")
         elif op1 == 4:

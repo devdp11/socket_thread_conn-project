@@ -54,8 +54,10 @@ def handle_input(client_socket, client_name, client_address):
                     else:
                         handle_thread(f"{client_name}: {msg}", client_socket)
                         print(f"[{time}] - Message sent by client {client_name}-[{client_address}]: {msg}")
+
             elif message.startswith('list'):
                 client_socket.send("\nConnected Clients:\n".encode('utf-8') + ", ".join(usernames).encode('utf-8'))
+                
             else:
                 # Senão for mensagem de calculo, é enviado uma mensagem para o cmd, com o nome do cliente que a enviou e o conteúdo da mensagem
                 full_message = f"[{time}] - Message sent by client {client_name}-[{client_address}]: {message}"
