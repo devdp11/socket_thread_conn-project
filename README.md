@@ -1,3 +1,4 @@
-Trabalho de Investigação sobre os Sockets realizado pelos alunos:
-Diogo Pinheiro - Nº28244
-Diogo Reis - Nº28239
+# socket-project
+exercise project made by students
+- Diogo Pinheiro - 28244
+- Diogo Reis - Nº28239
